@@ -63,7 +63,7 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
         body: body.string,
       };
     } catch (e) {
-      context.log('Failure processing GraphQL request', e);
+      context.log.error('Failure processing GraphQL request', e);
       return {
         statusCode: 400,
         body: (e as Error).message,
