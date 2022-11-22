@@ -3,7 +3,6 @@ import type {
   Context,
   HttpRequest,
   HttpRequestHeaders,
-  HttpRequestQuery,
 } from '@azure/functions';
 import {
   ApolloServer,
@@ -55,7 +54,7 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
       }
 
       return {
-        statusCode: status || 200,
+        status: status || 200,
         headers: {
           ...Object.fromEntries(headers),
           'content-length': Buffer.byteLength(body.string).toString(),
@@ -65,7 +64,7 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
     } catch (e) {
       context.log.error('Failure processing GraphQL request', e);
       return {
-        statusCode: 400,
+        status: 400,
         body: (e as Error).message,
       };
     }
@@ -80,9 +79,24 @@ function normalizeRequest(req: HttpRequest): HTTPGraphQLRequest {
   return {
     method: req.method,
     headers: normalizeHeaders(req.headers),
-    search: normalizeQueryStringParams(req.query),
-    body: req.body,
+    search: new URL(req.url).search,
+    body: parseBody(req.body, req.headers['content-type']),
   };
+}
+
+function parseBody(
+  body: string | null | undefined,
+  contentType: string | undefined,
+): object | string {
+  if (body) {
+    if (contentType === 'application/json' && typeof body === 'string') {
+      return JSON.parse(body);
+    }
+    if (contentType === 'text/plain') {
+      return body;
+    }
+  }
+  return '';
 }
 
 function normalizeHeaders(headers: HttpRequestHeaders): HeaderMap {
@@ -91,17 +105,4 @@ function normalizeHeaders(headers: HttpRequestHeaders): HeaderMap {
     headerMap.set(key, value ?? '');
   }
   return headerMap;
-}
-
-function normalizeQueryStringParams(
-  queryStringParams: HttpRequestQuery | null,
-): string {
-  const queryStringRecord: Record<string, string> = {};
-  for (const [key, value] of Object.entries(queryStringParams ?? {})) {
-    queryStringRecord[key] = value ?? '';
-  }
-  return Object.keys(queryStringRecord).reduce(
-    (acc, key) => `${acc}&${key}=${queryStringRecord[key]}`,
-    '',
-  );
 }

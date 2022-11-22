@@ -4,6 +4,7 @@ import type {
   HttpMethod,
   HttpRequest,
   HttpRequestHeaders,
+  HttpRequestQuery,
   Logger,
 } from '@azure/functions';
 import type {
@@ -13,7 +14,6 @@ import type {
   ServerResponse,
 } from 'http';
 import type { AddressInfo } from 'net';
-import { format } from 'url';
 
 export function urlForHttpServer(httpServer: Server): string {
   const { address, port } = httpServer.address() as AddressInfo;
@@ -25,12 +25,7 @@ export function urlForHttpServer(httpServer: Server): string {
   // when listening).
   const hostname = address === '' || address === '::' ? 'localhost' : address;
 
-  return format({
-    protocol: 'http',
-    hostname,
-    port,
-    pathname: '/',
-  });
+  return `http://${hostname}:${port}`;
 }
 
 export const createMockServer = (handler: AzureFunction) => {
@@ -41,10 +36,10 @@ export const createMockServer = (handler: AzureFunction) => {
     req.on('end', async () => {
       const azReq: HttpRequest = {
         method: (req.method as HttpMethod) || null,
-        url: req.url || '',
+        url: new URL(req.url || '', 'http://localhost').toString(),
         headers: processHeaders(req.headers),
         body,
-        query: {},
+        query: processQuery(req.url),
         params: {},
         user: null,
         parseFormBody: () => {
@@ -84,6 +79,24 @@ export const createMockServer = (handler: AzureFunction) => {
       res.end();
     });
   };
+};
+
+const processQuery: (url: string | undefined) => HttpRequestQuery = (url) => {
+  if (!url) {
+    return {};
+  }
+
+  const uri = new URL(url, 'http://localhost');
+
+  const query: HttpRequestQuery = {};
+  for (const [key, value] of uri.searchParams.entries()) {
+    if (query[key] !== undefined) {
+      query[key] = `${query[key]},${value}`;
+    } else {
+      query[key] = value;
+    }
+  }
+  return query;
 };
 
 const processHeaders: (headers: IncomingHttpHeaders) => HttpRequestHeaders = (
