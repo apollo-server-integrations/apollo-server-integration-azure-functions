@@ -8,3 +8,8 @@ dist/**/__tests__/**
 !tsconfig.base.json
 !tsconfig.json
 !tsconfig.build.json
+README.md
+test-project
+definition-manifest.json
+.vscode
+.npmignore
