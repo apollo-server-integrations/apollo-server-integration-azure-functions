@@ -1,23 +1,23 @@
 {
-	"name": "Debian",
-	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
-	"features": {
-		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/jlaundry/devcontainer-features/azure-functions-core-tools:1": {}
-	  },
-	
-	  "forwardPorts": [7071],
-	
-	  "postCreateCommand": ". ${NVM_DIR}/nvm.sh && nvm install && npm install",
-	
-	  "extensions": [
-		"esbenp.prettier-vscode",
-		"dbaeumer.vscode-eslint",
-		"streetsidesoftware.code-spell-checker",
-		"ms-azuretools.vscode-azurefunctions",
-		"ms-azuretools.vscode-azurestorage",
-		"GitHub.vscode-pull-request-github",
-		"Azurite.azurite"
-	  ]
+  "name": "Debian",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/jlaundry/devcontainer-features/azure-functions-core-tools:1": {}
+  },
+
+  "forwardPorts": [7071],
+
+  "postCreateCommand": ". ${NVM_DIR}/nvm.sh && nvm install && npm install",
+
+  "extensions": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "streetsidesoftware.code-spell-checker",
+    "ms-azuretools.vscode-azurefunctions",
+    "ms-azuretools.vscode-azurestorage",
+    "GitHub.vscode-pull-request-github",
+    "Azurite.azurite"
+  ]
 }
