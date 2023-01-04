@@ -1,17 +1,16 @@
 {
-  "name": "@apollo/typescript-repo-template",
-  "private": true,
-  "description": "A template for TypeScript projects with pre-configured tooling",
+  "name": "@as-integrations/azure-functions",
+  "description": "An integration for Apollo Server on Azure Functions",
   "version": "0.0.0",
   "author": "Apollo <packages@apollographql.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/apollographql/typescript-repo-template"
+    "url": "https://github.com/apollo-server-integrations/apollo-server-integration-azure-functions"
   },
-  "homepage": "https://github.com/apollographql/typescript-repo-template#readme",
+  "homepage": "https://github.com/apollo-server-integrations/apollo-server-integration-azure-functions#readme",
   "bugs": {
-    "url": "https://github.com/apollographql/typescript-repo-template/issues"
+    "url": "https://github.com/apollo-server-integrations/apollo-server-integration-azure-functions/issues"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
