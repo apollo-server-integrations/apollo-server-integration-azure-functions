@@ -50,7 +50,7 @@
   },
   "volta": {
     "node": "18.13.0",
-    "npm": "8.19.2"
+    "npm": "9.3.0"
   },
   "dependencies": {
     "@apollo/server": "^4.1.1",
