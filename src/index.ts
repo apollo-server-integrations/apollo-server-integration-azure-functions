@@ -89,10 +89,10 @@ function parseBody(
   contentType: string | undefined,
 ): object | string {
   if (body) {
-    if (contentType === 'application/json' && typeof body === 'string') {
-      return JSON.parse(body);
-    }
-    if (contentType === 'text/plain') {
+    if (contentType === 'application/json') {
+      if (typeof body === 'string') {
+        return JSON.parse(body);
+      }
       return body;
     }
   }
