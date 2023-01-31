@@ -88,8 +88,8 @@ function parseBody(
   body: string | null | undefined,
   contentType: string | undefined,
 ): object | string {
-  if (body) {
-    if (contentType === 'application/json') {
+  if (body && contentType) {
+    if (contentType.indexOf('application/json') >= 0) {
       if (typeof body === 'string') {
         return JSON.parse(body);
       }
