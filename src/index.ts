@@ -80,23 +80,23 @@ function normalizeRequest(req: HttpRequest): HTTPGraphQLRequest {
     method: req.method,
     headers: normalizeHeaders(req.headers),
     search: new URL(req.url).search,
-    body: parseBody(req.body, req.headers['content-type']),
+    body: parseBody(req.method, req.body, req.headers['content-type']),
   };
 }
 
 function parseBody(
+  method: string | undefined,
   body: string | null | undefined,
   contentType: string | undefined,
-): object | string {
-  if (body) {
-    if (contentType === 'application/json') {
-      if (typeof body === 'string') {
-        return JSON.parse(body);
-      }
-      return body;
-    }
+): object | null {
+  const isValidContentType = contentType?.startsWith('application/json');
+  const isValidPostRequest =
+    method === 'POST' && typeof body === 'string' && isValidContentType;
+
+  if (isValidPostRequest) {
+    return JSON.parse(body);
   }
-  return '';
+  return null;
 }
 
 function normalizeHeaders(headers: HttpRequestHeaders): HeaderMap {
