@@ -89,7 +89,9 @@ function parseBody(
   body: string | null | undefined,
   contentType: string | undefined,
 ): object | null {
-  const isValidContentType = contentType?.startsWith('application/json');
+  const isValidContentType =
+    contentType?.startsWith('application/json') ||
+    contentType?.startsWith('application/graphql');
   const isValidPostRequest =
     method === 'POST' && typeof body === 'string' && isValidContentType;
 
