@@ -15,6 +15,7 @@ import type { WithRequired } from '@apollo/utils.withrequired';
 
 export interface AzureFunctionsContextFunctionArgument {
   context: Context;
+  req: HttpRequest;
 }
 
 export interface AzureFunctionsMiddlewareOptions<TContext extends BaseContext> {
@@ -46,7 +47,7 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
 
       const { body, headers, status } = await server.executeHTTPGraphQLRequest({
         httpGraphQLRequest: normalizedRequest,
-        context: () => contextFunction({ context }),
+        context: () => contextFunction({ context, req }),
       });
 
       if (body.kind === 'chunked') {
