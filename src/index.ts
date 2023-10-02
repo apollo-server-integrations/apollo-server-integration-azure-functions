@@ -58,6 +58,7 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
         status: status || 200,
         headers: {
           ...Object.fromEntries(headers),
+          ...context?.res?.headers,
           'content-length': Buffer.byteLength(body.string).toString(),
         },
         body: body.string,
