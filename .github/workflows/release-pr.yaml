@@ -13,7 +13,7 @@ jobs:
     name: 🛠️ Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout
 
       - name: Setup Node.js ${{ env.NODE_VERSION }}
@@ -31,7 +31,7 @@ jobs:
     name: 🧪 Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout
 
       - name: Setup Node.js ${{ env.NODE_VERSION }}
@@ -49,7 +49,7 @@ jobs:
     name: 🔗 Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout
 
       - name: Setup Node.js ${{ env.NODE_VERSION }}
@@ -72,7 +72,7 @@ jobs:
     needs: [build, test, lint]
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
