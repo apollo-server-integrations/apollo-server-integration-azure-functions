@@ -1,5 +1,5 @@
 import { ApolloServer } from '@apollo/server';
-import { startServerAndCreateHandler } from '../..';
+import { startServerAndCreateHandler } from '../../..';
 
 // The GraphQL schema
 const typeDefs = `#graphql

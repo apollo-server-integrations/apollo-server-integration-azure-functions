@@ -23,10 +23,12 @@ npm install @as-integrations/azure-functions @apollo/server graphql @azure/funct
 
 ## **Usage**
 
+
 1. Setup an [Azure Function with TypeScript](https://learn.microsoft.com/azure/azure-functions/create-first-function-vs-code-typescript) (or [JavaScript](https://learn.microsoft.com/azure/azure-functions/create-first-function-vs-code-node)) as per normal.
 2. Create a new [HTTP Trigger](https://learn.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=in-process%2Cfunctionsv2&pivots=programming-language-javascript)
 3. Update the `index.ts` to use the Apollo integration:
 
+**v3**
 ```ts
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateHandler } from '@as-integrations/azure-functions';
@@ -54,7 +56,37 @@ const server = new ApolloServer({
 export default startServerAndCreateHandler(server);
 ```
 
-4. Update the `function.json` HTTP output binding to use `$return` as the name, as the integration returns from the Function Handler:
+**v4**
+```ts
+import { ApolloServer } from '@apollo/server';
+import { v4 } from '@as-integrations/azure-functions';
+
+// The GraphQL schema
+const typeDefs = `#graphql
+  type Query {
+    hello: String
+  }
+`;
+
+// A map of functions which return data for the schema.
+const resolvers = {
+  Query: {
+    hello: () => 'world',
+  },
+};
+
+// Set up Apollo Server
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
+
+app.http('graphql', {
+  handler: v4.startServerAndCreateHandler(server),
+});
+```
+
+4. Update the `function.json` HTTP output binding to use `$return` as the name, as the integration returns from the Function Handler **(v3 only)**:
 
 ```json
 {
