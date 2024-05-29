@@ -6,6 +6,7 @@ import {
 } from '@azure/functions-v4';
 import type { IncomingMessage, Server, ServerResponse } from 'http';
 import type { AddressInfo } from 'net';
+import { ReadableStream } from 'stream/web';
 import { Headers, HeadersInit } from 'undici';
 
 export function urlForHttpServer(httpServer: Server): string {
@@ -31,7 +32,12 @@ export const createMockServer = (handler: HttpHandler) => {
         method: (req.method as HttpMethod) || null,
         url: new URL(req.url || '', 'http://localhost').toString(),
         headers: new Headers(req.headers as HeadersInit),
-        body,
+        body: new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode(body));
+            controller.close();
+          },
+        }),
         query: new URLSearchParams(req.url),
         params: {},
         user: null,
@@ -49,6 +55,9 @@ export const createMockServer = (handler: HttpHandler) => {
         },
         bodyUsed: false,
         formData: async () => {
+          throw new Error('Not implemented');
+        },
+        clone: () => {
           throw new Error('Not implemented');
         },
       };

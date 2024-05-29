@@ -45,6 +45,7 @@ export const createMockServer = (handler: AzureFunction) => {
         parseFormBody: () => {
           throw new Error('Not implemented');
         },
+        get: () => void 0,
       };
 
       const context: Context = {
