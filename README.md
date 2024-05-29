@@ -23,12 +23,12 @@ npm install @as-integrations/azure-functions @apollo/server graphql @azure/funct
 
 ## **Usage**
 
-
 1. Setup an [Azure Function with TypeScript](https://learn.microsoft.com/azure/azure-functions/create-first-function-vs-code-typescript) (or [JavaScript](https://learn.microsoft.com/azure/azure-functions/create-first-function-vs-code-node)) as per normal.
 2. Create a new [HTTP Trigger](https://learn.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=in-process%2Cfunctionsv2&pivots=programming-language-javascript)
 3. Update the `index.ts` to use the Apollo integration:
 
 **v3**
+
 ```ts
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateHandler } from '@as-integrations/azure-functions';
@@ -57,6 +57,7 @@ export default startServerAndCreateHandler(server);
 ```
 
 **v4**
+
 ```ts
 import { ApolloServer } from '@apollo/server';
 import { v4 } from '@as-integrations/azure-functions';
