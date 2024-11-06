@@ -15,7 +15,13 @@ import type { WithRequired } from '@apollo/utils.withrequired';
 
 export interface AzureFunctionsContextFunctionArgument {
   context: InvocationContext;
-  req: HttpRequest;
+  // Omit the body parsing methods from the HttpRequest type, since at this point the body has already been parsed
+  // if the user try to use the body parsing methods, it will throw an error
+  req: Omit<
+    HttpRequest,
+    'body' | 'arrayBuffer' | 'blob' | 'formData' | 'json' | 'text'
+  >;
+  body: unknown;
 }
 
 export interface AzureFunctionsMiddlewareOptions<TContext extends BaseContext> {
@@ -47,7 +53,7 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
 
       const { body, headers, status } = await server.executeHTTPGraphQLRequest({
         httpGraphQLRequest: normalizedRequest,
-        context: () => contextFunction({ context, req }),
+        context: () => contextFunction({ context, req, body: normalizedRequest.body }),
       });
 
       if (body.kind === 'chunked') {
