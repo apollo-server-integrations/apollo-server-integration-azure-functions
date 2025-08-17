@@ -27,6 +27,20 @@ const defaultContext: ContextFunction<
   any
 > = async () => ({});
 
+/**
+ * Transforms an async iterable of strings into an async iterable of Uint8Array.
+ * This is useful for creating a `BodyInit` for a `fetch` request from a string stream.
+ *
+ */
+async function* toUint8ArrayStream(
+  source: AsyncIterable<string>,
+): AsyncIterable<Uint8Array> {
+  const encoder = new TextEncoder();
+  for await (const chunk of source) {
+    yield encoder.encode(chunk);
+  }
+}
+
 export function startServerAndCreateHandler(
   server: ApolloServer<BaseContext>,
   options?: AzureFunctionsMiddlewareOptions<BaseContext>,
@@ -47,11 +61,26 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
 
       const { body, headers, status } = await server.executeHTTPGraphQLRequest({
         httpGraphQLRequest: normalizedRequest,
-        context: () => contextFunction({ context, req }),
+        context: () =>
+          contextFunction({
+            context,
+            req: {
+              ...req,
+              // This promise was already used, so we need to create a new one.
+              json: () => Promise.resolve(normalizedRequest.body),
+            },
+          }),
       });
 
       if (body.kind === 'chunked') {
-        throw Error('Incremental delivery not implemented');
+        return {
+          status: status || 200,
+          headers: {
+            ...Object.fromEntries(headers),
+            'Transfer-Encoding': 'chunked',
+          },
+          body: toUint8ArrayStream(body.asyncIterator),
+        };
       }
 
       return {
