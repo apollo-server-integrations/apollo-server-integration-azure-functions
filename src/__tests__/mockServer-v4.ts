@@ -7,7 +7,6 @@ import {
 import type { IncomingMessage, Server, ServerResponse } from 'http';
 import type { AddressInfo } from 'net';
 import { ReadableStream } from 'stream/web';
-import { Headers, HeadersInit } from 'undici';
 
 export function urlForHttpServer(httpServer: Server): string {
   const { address, port } = httpServer.address() as AddressInfo;
@@ -28,10 +27,15 @@ export const createMockServer = (handler: HttpHandler) => {
     req.on('data', (chunk) => (body += chunk));
 
     req.on('end', async () => {
+      const headers = new Headers();
+      for (const [key, value] of Object.entries(req.headers)) {
+        headers.set(key, value as string);
+      }
+
       const azReq: HttpRequest = {
         method: (req.method as HttpMethod) || null,
         url: new URL(req.url || '', 'http://localhost').toString(),
-        headers: new Headers(req.headers as HeadersInit),
+        headers,
         body: new ReadableStream({
           start(controller) {
             controller.enqueue(new TextEncoder().encode(body));
@@ -74,7 +78,19 @@ export const createMockServer = (handler: HttpHandler) => {
       Object.entries(azRes.headers ?? {}).forEach(([key, value]) => {
         res.setHeader(key, value!.toString());
       });
-      res.write(azRes.body);
+      try {
+        const body: any = azRes.body;
+        if (body && typeof body[Symbol.asyncIterator] === 'function') {
+          // If the body is an async iterable, we stream it
+          for await (const chunk of body as AsyncIterable<any>) {
+            res.write(chunk);
+          }
+        } else if (body !== undefined && body !== null) {
+          res.write(body);
+        }
+      } catch (error) {
+        console.error('Error writing response:', error);
+      }
       res.end();
     });
   };
