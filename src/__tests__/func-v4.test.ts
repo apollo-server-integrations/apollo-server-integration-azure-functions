@@ -14,7 +14,7 @@ describe('Azure Functions v4', () => {
       testOptions?: CreateServerForIntegrationTestsOptions,
     ) {
       const httpServer = createServer();
-      const server = new ApolloServer(serverOptions );
+      const server = new ApolloServer(serverOptions);
 
       const handler = testOptions
         ? v4.startServerAndCreateHandler(server, testOptions)
