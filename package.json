@@ -1,7 +1,7 @@
 {
   "name": "@as-integrations/azure-functions",
   "description": "An integration for Apollo Server on Azure Functions",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Apollo <packages@apollographql.com>",
   "license": "MIT",
   "repository": {
@@ -32,6 +32,10 @@
     "start": "npm-run-all watch start:host",
     "start:host": "cd src/sample && func start --cors *"
   },
+  "dependencies": {
+    "@azure/functions": "^3.5.1",
+    "@azure/functions-v4": "npm:@azure/functions@^4.7.2"
+  },
   "devDependencies": {
     "@apollo/server": "^5.0.0",
     "@apollo/server-integration-testsuite": "^5.0.0",
@@ -55,8 +59,6 @@
     "npm": "11.5.2"
   },
   "peerDependencies": {
-    "@apollo/server": "^4.0.0 || ^5.0.0",
-    "@azure/functions": "^3",
-    "@azure/functions-v4": "npm:@azure/functions@^4"
+    "@apollo/server": "^4.0.0 || ^5.0.0"
   }
 }
