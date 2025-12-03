@@ -21,6 +21,49 @@ export function urlForHttpServer(httpServer: Server): string {
   return `http://${hostname}:${port}`;
 }
 
+function createHttpRequest(
+  method: HttpMethod,
+  url: string,
+  headers: Headers,
+  bodyContent: string,
+): HttpRequest {
+  const createRequest = (): HttpRequest => ({
+    method,
+    url,
+    headers,
+    body: new ReadableStream({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(bodyContent));
+        controller.close();
+      },
+    }),
+    query: new URLSearchParams(new URL(url).search),
+    params: {},
+    user: null,
+    arrayBuffer: async () => {
+      return Buffer.from(bodyContent).buffer;
+    },
+    text: async () => {
+      return bodyContent;
+    },
+    json: async () => {
+      return JSON.parse(bodyContent);
+    },
+    blob: async () => {
+      throw new Error('Not implemented');
+    },
+    bodyUsed: false,
+    formData: async () => {
+      throw new Error('Not implemented');
+    },
+    clone: () => {
+      return createRequest();
+    },
+  });
+
+  return createRequest();
+}
+
 export const createMockServer = (handler: HttpHandler) => {
   return (req: IncomingMessage, res: ServerResponse) => {
     let body = '';
@@ -32,39 +75,12 @@ export const createMockServer = (handler: HttpHandler) => {
         headers.set(key, value as string);
       }
 
-      const azReq: HttpRequest = {
-        method: (req.method as HttpMethod) || null,
-        url: new URL(req.url || '', 'http://localhost').toString(),
+      const azReq = createHttpRequest(
+        (req.method as HttpMethod) || null,
+        new URL(req.url || '', 'http://localhost').toString(),
         headers,
-        body: new ReadableStream({
-          start(controller) {
-            controller.enqueue(new TextEncoder().encode(body));
-            controller.close();
-          },
-        }),
-        query: new URLSearchParams(req.url),
-        params: {},
-        user: null,
-        arrayBuffer: async () => {
-          return Buffer.from(body).buffer;
-        },
-        text: async () => {
-          return body;
-        },
-        json: async () => {
-          return JSON.parse(body);
-        },
-        blob: async () => {
-          throw new Error('Not implemented');
-        },
-        bodyUsed: false,
-        formData: async () => {
-          throw new Error('Not implemented');
-        },
-        clone: () => {
-          throw new Error('Not implemented');
-        },
-      };
+        body,
+      );
 
       const context = new InvocationContext({
         invocationId: 'mock',

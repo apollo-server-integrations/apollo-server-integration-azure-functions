@@ -1,6 +1,7 @@
 *
 !src/**/*
 src/**/__tests__/**
+src/samples/**
 !dist/**/*
 dist/**/__tests__/**
 !package.json
