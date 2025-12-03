@@ -37,8 +37,8 @@
     "@azure/functions-v4": "npm:@azure/functions@^4"
   },
   "devDependencies": {
-    "@apollo/server": "5.0.0",
-    "@apollo/server-integration-testsuite": "5.0.0",
+    "@apollo/server": "5.2.0",
+    "@apollo/server-integration-testsuite": "5.2.0",
     "@changesets/changelog-github": "0.5.1",
     "@changesets/cli": "2.29.6",
     "@types/jest": "29.5.14",
