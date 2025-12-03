@@ -59,6 +59,6 @@
     "npm": "11.5.2"
   },
   "peerDependencies": {
-    "@apollo/server": "^4.0.0 || ^5.0.0"
+    "@apollo/server": "^4 || ^5"
   }
 }
