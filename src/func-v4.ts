@@ -5,7 +5,7 @@ import {
   HTTPGraphQLRequest,
   HeaderMap,
 } from '@apollo/server';
-import type {
+import {
   HttpHandler,
   HttpRequest,
   InvocationContext,
@@ -16,6 +16,13 @@ import type { WithRequired } from '@apollo/utils.withrequired';
 export interface AzureFunctionsContextFunctionArgument {
   context: InvocationContext;
   req: HttpRequest;
+  /**
+   * The parsed request body. This is already parsed from the request stream
+   * and should be used instead of calling `req.json()` for better performance.
+   * For POST requests with `application/json` content-type, this contains the parsed JSON object.
+   * For other requests, this will be `null`.
+   */
+  body: unknown;
 }
 
 export interface AzureFunctionsMiddlewareOptions<TContext extends BaseContext> {
@@ -57,6 +64,7 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
   return async (req: HttpRequest, context: InvocationContext) => {
     const contextFunction = options?.context ?? defaultContext;
     try {
+      const cloneReq = req.clone();
       const normalizedRequest = await normalizeRequest(req);
 
       const { body, headers, status } = await server.executeHTTPGraphQLRequest({
@@ -64,11 +72,8 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
         context: () =>
           contextFunction({
             context,
-            req: {
-              ...req,
-              // This promise was already used, so we need to create a new one.
-              json: () => Promise.resolve(normalizedRequest.body),
-            },
+            req: cloneReq,
+            body: normalizedRequest.body,
           }),
       });
 
