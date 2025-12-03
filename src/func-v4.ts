@@ -5,7 +5,7 @@ import {
   HTTPGraphQLRequest,
   HeaderMap,
 } from '@apollo/server';
-import {
+import type {
   HttpHandler,
   HttpRequest,
   InvocationContext,
