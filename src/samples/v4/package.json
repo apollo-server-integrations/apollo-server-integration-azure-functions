@@ -18,6 +18,6 @@
     "azure-functions-core-tools": "4.5.0",
     "@types/node": "18.19.130",
     "typescript": "4.9.5",
-    "rimraf": "5.0.10"
+    "rimraf": "6.1.2"
   }
 }
