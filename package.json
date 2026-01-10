@@ -33,7 +33,7 @@
     "start:host": "cd src/sample && func start --cors *"
   },
   "dependencies": {
-    "@azure/functions": "^3",
+    "@azure/functions": "^4.0.0",
     "@azure/functions-v4": "npm:@azure/functions@^4"
   },
   "devDependencies": {
