@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  NODE_VERSION: 20.x
+  NODE_VERSION: 24.x
 
 jobs:
   build:
@@ -69,6 +69,10 @@ jobs:
   release:
     name: 🚢 Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     needs: [build, test, lint]
     steps:
       - name: Checkout Repo
@@ -91,4 +95,4 @@ jobs:
           publish: npm run publish-changeset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ''
