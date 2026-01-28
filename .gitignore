@@ -29,3 +29,7 @@ node_modules/
 
 # Volta binaries (when using direnv/.envrc)
 .volta
+
+# Samples build artifacts
+samples/dist/
+samples/node_modules/

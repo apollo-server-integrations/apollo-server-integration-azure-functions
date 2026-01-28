@@ -1,14 +1,14 @@
 import { ApolloServer } from '@apollo/server';
+import { app } from '@azure/functions';
 import { startServerAndCreateHandler } from '../../..';
 
-// The GraphQL schema
+// The simplest example possible
 const typeDefs = `#graphql
   type Query {
     hello: String
   }
 `;
 
-// A map of functions which return data for the schema.
 const resolvers = {
   Query: {
     hello: () => 'world',
@@ -21,4 +21,6 @@ const server = new ApolloServer({
   resolvers,
 });
 
-export default startServerAndCreateHandler(server);
+app.http('graphql-simple', {
+  handler: startServerAndCreateHandler(server),
+});
