@@ -19,6 +19,7 @@
     "noUnusedLocals": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["es2022", "esnext.asynciterable"],
+    "skipLibCheck": true,
     "types": ["node"],
     "baseUrl": ".",
     "paths": {

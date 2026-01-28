@@ -2,7 +2,7 @@
   "name": "sample-v4",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/src/functions/*.js",
+  "main": "dist/functions/*.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
@@ -11,11 +11,8 @@
     "start": "func start",
     "test": "echo \"No tests yet...\""
   },
-  "dependencies": {
-    "@azure/functions": "^4.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "azure-functions-core-tools": "^4.5.0",
     "@types/node": "^22",
     "typescript": "^5",
     "rimraf": "^6.1.2"
