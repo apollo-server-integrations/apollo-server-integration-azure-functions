@@ -1,9 +1,11 @@
 {
   "name": "@as-integrations/azure-functions",
   "description": "An integration for Apollo Server on Azure Functions",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "author": "Apollo <packages@apollographql.com>",
   "license": "MIT",
+  "sideEffects": false,
+  "keywords": ["apollo", "apollo-server", "azure", "azure-functions", "graphql", "integration"],
   "repository": {
     "type": "git",
     "url": "https://github.com/apollo-server-integrations/apollo-server-integration-azure-functions"
@@ -14,13 +16,19 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": ["dist", "README.md"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=22.0"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "git clean -dfqX",
-    "install-with-npm-8.5": "npm i -g npm@^8.5.0 && npm i",
     "prepack": "npm run build",
     "prettier-check": "prettier --check .",
     "prettier-fix": "prettier --write .",
@@ -30,35 +38,32 @@
     "test:ci": "jest --coverage --ci --maxWorkers=2 --reporters=default --reporters=jest-junit",
     "watch": "tsc --build --watch",
     "start": "npm-run-all watch start:host",
-    "start:host": "cd src/sample && func start --cors *"
-  },
-  "dependencies": {
-    "@azure/functions": "^3",
-    "@azure/functions-v4": "npm:@azure/functions@^4"
+    "start:host": "cd samples && func start --cors *"
   },
   "devDependencies": {
-    "@apollo/server": "5.2.0",
-    "@apollo/server-integration-testsuite": "5.2.0",
-    "@changesets/changelog-github": "0.5.1",
-    "@changesets/cli": "2.29.6",
+    "@apollo/server": "5.3.0",
+    "@apollo/server-integration-testsuite": "5.3.0",
+    "@changesets/changelog-github": "0.5.2",
+    "@changesets/cli": "2.29.8", 
     "@types/jest": "29.5.14",
-    "@types/node": "18.19.123",
-    "azure-functions-core-tools": "4.1.2",
-    "cspell": "9.2.0",
-    "graphql": "16.11.0",
-    "jest": "30.0.5",
+    "@types/node": "^22",
+    "azure-functions-core-tools": "4.6.0",
+    "cspell": "9.6.2",
+    "graphql": "16.12.0",
+    "jest": "30.2.0",
     "jest-junit": "16.0.0",
     "npm-run-all": "4.1.5",
-    "prettier": "2.7.1",
-    "ts-jest": "29.4.1",
+    "prettier": "3.8.1",
+    "ts-jest": "29.4.6",
     "ts-node": "10.9.2",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   },
   "volta": {
-    "node": "20.19.4",
+    "node": "22.12.0",
     "npm": "11.5.2"
   },
   "peerDependencies": {
-    "@apollo/server": "^4 || ^5"
+    "@apollo/server": "^4 || ^5",
+    "@azure/functions": "^4"
   }
 }

@@ -1,19 +1,12 @@
-import type {
-  AzureFunction,
-  Context,
-  HttpMethod,
-  HttpRequest,
-  HttpRequestHeaders,
-  HttpRequestQuery,
-  Logger,
+import {
+  HttpHandler,
+  InvocationContext,
+  type HttpMethod,
+  type HttpRequest,
 } from '@azure/functions';
-import type {
-  IncomingHttpHeaders,
-  IncomingMessage,
-  Server,
-  ServerResponse,
-} from 'http';
+import type { IncomingMessage, Server, ServerResponse } from 'http';
 import type { AddressInfo } from 'net';
+import { ReadableStream } from 'stream/web';
 
 export function urlForHttpServer(httpServer: Server): string {
   const { address, port } = httpServer.address() as AddressInfo;
@@ -28,93 +21,93 @@ export function urlForHttpServer(httpServer: Server): string {
   return `http://${hostname}:${port}`;
 }
 
-export const createMockServer = (handler: AzureFunction) => {
+function createHttpRequest(
+  method: HttpMethod,
+  url: string,
+  headers: Headers,
+  bodyContent: string,
+): HttpRequest {
+  const createRequest = (): HttpRequest => ({
+    method,
+    url,
+    headers,
+    body: new ReadableStream({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(bodyContent));
+        controller.close();
+      },
+    }),
+    query: new URLSearchParams(new URL(url).search),
+    params: {},
+    user: null,
+    arrayBuffer: async () => {
+      return Buffer.from(bodyContent).buffer;
+    },
+    text: async () => {
+      return bodyContent;
+    },
+    json: async () => {
+      return JSON.parse(bodyContent);
+    },
+    blob: async () => {
+      throw new Error('Not implemented');
+    },
+    bodyUsed: false,
+    formData: async () => {
+      throw new Error('Not implemented');
+    },
+    clone: () => {
+      return createRequest();
+    },
+  });
+
+  return createRequest();
+}
+
+export const createMockServer = (handler: HttpHandler) => {
   return (req: IncomingMessage, res: ServerResponse) => {
     let body = '';
     req.on('data', (chunk) => (body += chunk));
 
     req.on('end', async () => {
-      const azReq: HttpRequest = {
-        method: (req.method as HttpMethod) || null,
-        url: new URL(req.url || '', 'http://localhost').toString(),
-        headers: processHeaders(req.headers),
+      const headers = new Headers();
+      for (const [key, value] of Object.entries(req.headers)) {
+        headers.set(key, value as string);
+      }
+
+      const azReq = createHttpRequest(
+        (req.method as HttpMethod) || null,
+        new URL(req.url || '', 'http://localhost').toString(),
+        headers,
         body,
-        query: processQuery(req.url),
-        params: {},
-        user: null,
-        parseFormBody: () => {
-          throw new Error('Not implemented');
-        },
-        get: () => void 0,
-      };
+      );
 
-      const context: Context = {
+      const context = new InvocationContext({
         invocationId: 'mock',
-        executionContext: {
-          invocationId: 'mock',
-          functionName: 'mock',
-          functionDirectory: 'mock',
-          retryContext: null,
-        },
-        bindings: {},
-        bindingData: {
-          invocationId: 'mock',
-        },
-        log: createConsoleLogger(),
-        bindingDefinitions: [],
-        traceContext: {
-          traceparent: '',
-          tracestate: '',
-          attributes: {},
-        },
-        done: () => {},
-      };
+        functionName: 'mock',
+        logHandler: console.log,
+      });
 
-      const azRes = await handler(context, azReq);
+      const azRes = await handler(azReq, context);
 
       res.statusCode = azRes.status || 200;
       Object.entries(azRes.headers ?? {}).forEach(([key, value]) => {
         res.setHeader(key, value!.toString());
       });
-      res.write(azRes.body);
+      try {
+        const body: any = azRes.body;
+        if (body && typeof body[Symbol.asyncIterator] === 'function') {
+          // If the body is an async iterable, we stream it
+          for await (const chunk of body as AsyncIterable<any>) {
+            res.write(chunk);
+          }
+        } else if (body !== undefined && body !== null) {
+          res.write(body);
+        }
+      } catch (error) {
+        console.error('Error writing response:', error);
+      }
       res.end();
     });
   };
-};
-
-const processQuery: (url: string | undefined) => HttpRequestQuery = (url) => {
-  if (!url) {
-    return {};
-  }
-
-  const uri = new URL(url, 'http://localhost');
-
-  const query: HttpRequestQuery = {};
-  for (const [key, value] of uri.searchParams.entries()) {
-    if (query[key] !== undefined) {
-      query[key] = `${query[key]},${value}`;
-    } else {
-      query[key] = value;
-    }
-  }
-  return query;
-};
-
-const processHeaders: (headers: IncomingHttpHeaders) => HttpRequestHeaders = (
-  headers,
-) => {
-  const result: HttpRequestHeaders = {};
-  for (const [key, value] of Object.entries(headers)) {
-    result[key] = Array.isArray(value) ? value.join(',') : value ?? '';
-  }
-  return result;
-};
-
-const createConsoleLogger = () => {
-  const logger = console.log as Logger;
-  logger.error = console.error;
-  logger.warn = console.warn;
-  logger.info = console.info;
-  logger.verbose = console.log;
-  return logger;
 };
