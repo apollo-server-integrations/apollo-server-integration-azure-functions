@@ -179,6 +179,7 @@ export function startServerAndCreateHandler<TContext extends BaseContext>(
           // Convert to plain object for Azure Functions.
           // Note: We explicitly set content-length for non-chunked responses.
           ...Object.fromEntries(headers),
+          ...context?.res?.headers,
           'content-length': Buffer.byteLength(body.string).toString(),
         },
         body: body.string,
