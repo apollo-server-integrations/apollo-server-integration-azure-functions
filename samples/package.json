@@ -14,7 +14,7 @@
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^22",
-    "typescript": "^5",
+    "typescript": "^6.0.0",
     "rimraf": "^6.1.2"
   }
 }
